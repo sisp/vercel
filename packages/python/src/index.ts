@@ -15,7 +15,11 @@ const {
   shouldServe,
   debug,
 } = buildUtils;
-import { installRequirement, installRequirementsFile } from './install';
+import {
+  installPackagesZipFile,
+  installRequirement,
+  installRequirementsFile,
+} from './install';
 
 async function pipenvConvert(cmd: string, srcDir: string) {
   debug('Running pipfile2req...');
@@ -179,6 +183,16 @@ export const build = async ({
       filePath: requirementsTxtPath,
       workPath: join(workPath, packagesDir),
       meta,
+    });
+  }
+
+  const packagesZip = join(entryDirectory, 'packages.zip');
+  if (fsFiles[packagesZip]) {
+    debug('Found local "packages.zip"');
+    const packagesZipPath = fsFiles[packagesZip].fsPath;
+    await installPackagesZipFile({
+      filePath: packagesZipPath,
+      workPath: join(workPath, packagesDir),
     });
   }
 

@@ -124,3 +124,31 @@ export async function installRequirementsFile({
   }
   await pipInstall(workPath, ['-r', filePath, ...args]);
 }
+
+interface InstallPackagesZipFileArg {
+  filePath: string;
+  workPath: string;
+}
+
+export async function installPackagesZipFile({
+  filePath,
+  workPath,
+}: InstallPackagesZipFileArg) {
+  await execa(
+    'python3',
+    ['-c', makeInstallPackagesZipFileCode(filePath, '.')],
+    {
+      stdio: 'pipe',
+      cwd: workPath,
+    }
+  );
+}
+
+const makeInstallPackagesZipFileCode = (
+  filePath: string,
+  targetPath: string
+) => `
+from zipfile import ZipFile
+with ZipFile('${filePath}') as f:
+    f.extractall('${targetPath}')
+`;
